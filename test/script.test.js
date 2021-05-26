@@ -27,6 +27,7 @@ export { options, default } from "https://cdn.jsdelivr.net/npm/kahwah";
 import { expect } from "cdnjs.com/libraries/chai";
 
 import http from "./script.mock.js";
+import { Server } from "k6/x/mock";
 
 describe("User", () => {
   const res = http.get("http://phantauth.net/user/joe");
@@ -36,4 +37,24 @@ describe("User", () => {
   });
 
   console.log(res.body);
+});
+
+describe("Shutdown", () => {
+  const api = new Server()
+    .get("/custom", (req, res) => {
+      res.json({ foo: "bar" });
+    })
+    .start();
+
+  console.log(`http://${api.addr()}/custom`);
+
+  const res = http.get(`http://${api.addr()}/custom`);
+
+  console.log(res.body); // {"foo":"bar"}
+
+  it("200 OK", () => {
+    expect(res.status).equal(200);
+  });
+
+  api.stop();
 });

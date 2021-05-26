@@ -30,6 +30,8 @@ function customMockExample() {
   const res = http.get(`http://${api.addr()}/custom`);
 
   console.log(res.body); // {"foo":"bar"}
+
+  api.stop();
 }
 
 export default function () {

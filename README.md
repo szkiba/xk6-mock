@@ -68,7 +68,7 @@ function defaultMockExample() {
 }
 ```
 
-With using the Server constructor you can create other mock server instances as well. Custom mock servers should start manually. The server address can be get from `addr()` function.
+With using the Server constructor you can create other mock server instances as well. Custom mock servers should start/stop manually. The server address can be get from `addr()` function.
 
 ```javascript
 import { Server } from "k6/x/mock";
@@ -83,6 +83,8 @@ function customMockExample() {
   const res = http.get(`http://${api.addr()}/custom`);
   
   console.log(res.body); // {"foo":"bar"}
+
+  api.stop();
 }
 
 export default function () {
