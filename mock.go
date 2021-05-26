@@ -48,14 +48,12 @@ func (g *GlobalMock) NewModuleInstancePerVU() interface{} {
 	return &Mock{
 		server:      server,
 		errorLogger: l,
-		servers:     []*muxpress.Server{server},
 	}
 }
 
 type Mock struct {
 	server      *muxpress.Server
 	errorLogger func(...interface{})
-	servers     []*muxpress.Server
 }
 
 func (m *Mock) XServer(ctxPtr *context.Context) (interface{}, error) {
@@ -67,8 +65,6 @@ func (m *Mock) XServer(ctxPtr *context.Context) (interface{}, error) {
 
 	rt := common.GetRuntime(*ctxPtr)
 	server := muxpress.NewServer(errorLogger)
-
-	m.servers = append(m.servers, server)
 
 	return common.Bind(rt, server, ctxPtr), nil
 }
@@ -84,7 +80,7 @@ func (m *Mock) requireBind(ctx context.Context) {
 }
 
 func (m *Mock) requireListen() error {
-	if m.server.Addr() != nil {
+	if m.server.IsRunning() {
 		return nil
 	}
 
@@ -117,11 +113,8 @@ func (m *Mock) Resolve(orig string) (string, error) {
 		return "", err
 	}
 
-	// not so efficient, but number of custom mock servers are small
-	for _, s := range m.servers {
-		if a := s.Addr(); a != nil && a.String() == u.Host {
-			return orig, nil
-		}
+	if u.Hostname() == "127.0.0.1" {
+		return orig, nil
 	}
 
 	u.Host = addr
