@@ -1,0 +1,94 @@
+# MIT License
+#
+# Copyright (c) 2021 Iván Szkiba
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+version: "3"
+
+env:
+  K6_VERSION: v0.32.0
+
+silent: true
+
+tasks:
+  default:
+    cmds:
+      - task: test
+
+  clean:
+    desc: Clean up working directory
+    cmds:
+      - rm -rf k6 .task node_modules
+
+  build:
+    sources:
+      - "**/*.go"
+    generates:
+      - k6
+    cmds:
+      - xk6 build --with github.com/szkiba/xk6-mock=$(pwd)
+
+  test:
+    deps: [build]
+    cmds:
+      - find test -name '*.test.js' | xargs -n 1 ./k6 run --no-usage-report --no-summary -q
+
+  npm:install:
+    cmds:
+      - yarn install
+    status:
+      - test -d node_modules
+
+  docs:
+    deps: [npm:install]
+    cmds:
+      - npx typedoc
+
+  lint:
+    deps: [npm:install]
+    cmds:
+      - golangci-lint run
+      - yarn eslint .
+
+  example:
+    deps: [npm:install, build]
+    cmds:
+      - cat README.md | ./node_modules/.bin/codedown js > test/readme-example.test.js
+      - ./k6 run --no-usage-report ./test/readme-example.test.js
+
+  usage:
+    deps: [npm:install, build]
+    cmds:
+      - cat README.md | ./node_modules/.bin/codedown javascript > test/readme-usage.test.js
+      - ./k6 run --no-usage-report --no-summary -q ./test/readme-usage.test.js
+
+  best:
+    deps: [npm:install, build]
+    cmds:
+      - cat README.md | ./node_modules/.bin/codedown JavaScript > test/readme-best-practice-mock.test.js
+      - cat test/readme-best-practice-mock.test.js | sed -e 's;./mock.js;k6/http;g' > test/readme-best-practice.test.js
+      - cat README.md | ./node_modules/.bin/codedown Javascript > test/mock.js
+      - ./k6 run --no-usage-report ./test/readme-best-practice-mock.test.js
+      - ./k6 run --no-usage-report ./test/readme-best-practice.test.js
+
+  script:
+    deps: [npm:install, build]
+    cmds:
+      - ./k6 run --no-usage-report --no-summary -q ./test/script.test.js
