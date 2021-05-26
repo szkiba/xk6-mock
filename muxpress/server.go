@@ -23,9 +23,14 @@
 package muxpress
 
 import (
+	"context"
+	"errors"
 	"net"
 	"net/http"
 	"strconv"
+	"sync"
+	"sync/atomic"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -37,6 +42,9 @@ type Server struct {
 	listener    net.Listener
 	errorLogger func(...interface{})
 	middlewares callbackChain
+	srv         *http.Server
+	running     uint32
+	mu          sync.Mutex
 }
 
 type CallbackFunc func(req *Request, res *Response, next func())
@@ -65,12 +73,16 @@ func (h callbackChain) call(req *Request, res *Response) bool {
 }
 
 func NewServer(log func(...interface{})) *Server {
-	return &Server{
+	s := &Server{
 		errorLogger: log,
 		Router:      mux.NewRouter(),
 		middlewares: make(callbackChain, 0),
 		listener:    nil,
+		srv:         nil,
+		running:     0,
 	}
+
+	return s
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -100,12 +112,33 @@ func (s *Server) Addr() *net.TCPAddr {
 	return addr
 }
 
+func (s *Server) IsRunning() bool {
+	return atomic.LoadUint32(&s.running) != 0
+}
+
 func (s *Server) Listen(port int, host string) (*Server, error) {
 	if err := s.listen(port, host); err != nil {
 		return nil, err
 	}
 
-	return s, http.Serve(s.listener, s.Router)
+	return s, s.run()
+}
+
+func (s *Server) run() error {
+	s.srv = new(http.Server)
+	s.srv.Handler = s
+
+	atomic.StoreUint32(&s.running, 1)
+
+	err := s.srv.Serve(s.listener)
+
+	if errors.Is(err, http.ErrServerClosed) {
+		err = nil
+	}
+
+	atomic.StoreUint32(&s.running, 0)
+
+	return err
 }
 
 func (s *Server) Start(port int, host string) (*Server, error) {
@@ -113,11 +146,36 @@ func (s *Server) Start(port int, host string) (*Server, error) {
 		return nil, err
 	}
 
-	go func() {
-		if err := http.Serve(s.listener, s.Router); err != nil {
+	done := make(chan bool)
+
+	go func(start chan bool) {
+		start <- true
+
+		if err := s.run(); err != nil {
 			s.errorLogger(err)
 		}
-	}()
+	}(done)
+
+	<-done
+
+	return s, nil
+}
+
+func (s *Server) Stop(timeout int) (*Server, error) {
+	if !s.IsRunning() {
+		return nil, ErrServerNotRunning
+	}
+
+	if timeout == 0 {
+		timeout = shutdownPeriod
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+
+	if err := s.srv.Shutdown(ctx); err != nil {
+		return nil, err
+	}
 
 	return s, nil
 }
@@ -136,7 +194,9 @@ func (s *Server) Handle(method string, path string, callback ...CallbackFunc) *S
 	}
 
 	r.Path(path).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.mu.Lock()
 		defer func() {
+			s.mu.Unlock()
 			if r := recover(); r != nil {
 				s.errorLogger(r)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -195,3 +255,7 @@ func (s *Server) Delete(path string, callback ...CallbackFunc) *Server {
 func (s *Server) Options(path string, callback ...CallbackFunc) *Server {
 	return s.Handle(http.MethodOptions, path, callback...)
 }
+
+var ErrServerNotRunning = errors.New("Server not running")
+
+const shutdownPeriod = 1 // seconds
