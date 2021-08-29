@@ -2,7 +2,7 @@
 
 A [k6](https://go.k6.io/k6) extension for mocking HTTP(S) servers during test development. The design of the library was inspired by [Express](https://expressjs.com/). If you already know Express framework, using this library should be very simple.
 
-Built for [k6](https://go.k6.io/k6) using [xk6](https://github.com/k6io/xk6).
+Built for [k6](https://go.k6.io/k6) using [xk6](https://github.com/grafana/xk6).
 
 ## Features
 
@@ -286,7 +286,7 @@ Then:
 
 1. Install `xk6`:
   ```bash
-  $ go install github.com/k6io/xk6/cmd/xk6@latest
+  $ go install go.k6.io/xk6/cmd/xk6@latest
   ```
 
 2. Build the binary:
