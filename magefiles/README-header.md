@@ -31,6 +31,9 @@ export default async function () {
 - Helps testing k6 tests with mock server
 - Supports sync and async `k6/http` API
 
+> **Note**
+> The implementation of a micro web framework (similar to Express.js) was moved to [muxpress](https://github.com/szkiba/muxpress) project. (Just in case you're interested in goja)
+
 ## Download
 
 You can download pre-built k6 binaries from [Releases](https://github.com/szkiba/xk6-mock/releases/) page. Check [Packages](https://github.com/szkiba/xk6-mock/pkgs/container/xk6-mock) page for pre-built k6 Docker images.
