@@ -6,10 +6,3 @@ bin
 dist
 node_modules
 yarn.lock
-coverage.txt
-k6
-
-# editor directories and files
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
