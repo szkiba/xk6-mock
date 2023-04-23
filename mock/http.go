@@ -9,6 +9,8 @@ import (
 	"go.k6.io/k6/js/common"
 )
 
+// XXX: add batch function support
+
 var (
 	urlFirstMethods  = []string{"get", "head", "post", "put", "patch", "options", "del"}
 	urlSecondMethods = []string{"request", "asyncRequest"}
