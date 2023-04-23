@@ -1,4 +1,6 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/szkiba/xk6-mock)](https://goreportcard.com/report/github.com/szkiba/xk6-mock)
 [![GitHub Actions](https://github.com/szkiba/xk6-mock/workflows/Test/badge.svg)](https://github.com/szkiba/xk6-mock/actions?query=workflow%3ATest+branch%3Amaster)
+[![codecov](https://codecov.io/gh/szkiba/xk6-mock/branch/master/graph/badge.svg?token=GK1JNCPH8U)](https://codecov.io/gh/szkiba/xk6-mock)
 
 # xk6-mock
 
