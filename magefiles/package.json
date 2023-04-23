@@ -1,0 +1,10 @@
+{
+  "name": "muxpress",
+  "private": true,
+  "devDependencies": {
+    "concat-md": "^0.5.1",
+    "typedoc": "^0.24.4",
+    "typedoc-plugin-markdown": "^3.15.1",
+    "typescript": "^5.0.4"
+  }
+}

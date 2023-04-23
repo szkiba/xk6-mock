@@ -1,0 +1,11 @@
+{
+  "theme": "markdown",
+  "hideBreadcrumbs": true,
+  "sourceLinkTemplate": "https://github.com/szkiba/xk6-mock/blob/master/api/index.d.ts#L{line}",
+  "hideInPageTOC": true,
+  "entryPoints": ["../api/index.d.ts"],
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "README-ts.md",
+  "out": "dist/docs",
+  "name": "Auxiliary"
+}
