@@ -1,7 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/szkiba/xk6-mock)](https://goreportcard.com/report/github.com/szkiba/xk6-mock)
 [![GitHub Actions](https://github.com/szkiba/xk6-mock/workflows/Test/badge.svg)](https://github.com/szkiba/xk6-mock/actions?query=workflow%3ATest+branch%3Amaster)
 [![codecov](https://codecov.io/gh/szkiba/xk6-mock/branch/master/graph/badge.svg?token=GK1JNCPH8U)](https://codecov.io/gh/szkiba/xk6-mock)
-[![Documentation](https://img.shields.io/badge/docs-reference-blue?logo=readme)](https://ivan.szkiba.hu/xk6-mock)
+[![Documentation](https://img.shields.io/badge/docs-reference-blue?logo=readme&logoColor=lightgray)](https://ivan.szkiba.hu/xk6-mock)
 
 
 # xk6-mock
@@ -95,7 +95,7 @@ docker run -v %cd%:/scripts -it --rm ghcr.io/szkiba/xk6-mock:latest run --out=da
 
 ## Example scripts
 
-There are many examples in the [script](https://github.com/szkiba/xk6-mock/blob/main/scripts/) directory that show how to use various features of the extension.
+There are many examples in the [scripts](https://github.com/szkiba/xk6-mock/tree/master/scripts) directory that show how to use various features of the extension.
 
 # API
 
