@@ -151,7 +151,7 @@ func Doc() error {
 
 	api = append(api, tsmd...)
 
-	if err := os.WriteFile("api/README.md", api, 0o644); err != nil {
+	if err := os.WriteFile("docs/README.md", api, 0o644); err != nil {
 		return err
 	}
 

@@ -1,5 +1,6 @@
 # xk6-mock API
 
+A [k6](https://go.k6.io/k6) extension enables mocking HTTP(S) servers during test development.
 The design of the extension was inspired by [Express.js](https://expressjs.com/).
 
 If you have already known Express.js framework, using this extension should be very simple.
