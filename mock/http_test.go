@@ -7,7 +7,7 @@ package mock
 import (
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,11 +34,11 @@ func TestModuleWrap(t *testing.T) {
 
 	helper.module.wrap(target, "method", 0)
 
-	callable, ok := goja.AssertFunction(target.Get("method"))
+	callable, ok := sobek.AssertFunction(target.Get("method"))
 
 	assert.True(t, ok)
 
-	_, err := callable(goja.Undefined(), helper.vu.Runtime().ToValue("https://example.com"))
+	_, err := callable(sobek.Undefined(), helper.vu.Runtime().ToValue("https://example.com"))
 
 	assert.NoError(t, err)
 	assert.Equal(t, "https://example.net", actual)

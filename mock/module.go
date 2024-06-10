@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/sirupsen/logrus"
 	"go.k6.io/k6/js/common"
 	"go.k6.io/k6/js/modules"
@@ -30,7 +30,7 @@ func (root *RootModule) NewModuleInstance(vu modules.VU) modules.Instance { // n
 		appCtor:        newApplicationCtor(vu, false),
 		appCtorSync:    newApplicationCtor(vu, true),
 		logger:         newLogger(vu),
-		apps:           make(map[string]*goja.Object),
+		apps:           make(map[string]*sobek.Object),
 		lookup:         make(map[string]string),
 	}
 }
@@ -38,9 +38,9 @@ func (root *RootModule) NewModuleInstance(vu modules.VU) modules.Instance { // n
 type Module struct {
 	*http.ModuleInstance
 	vu          modules.VU
-	appCtor     func(goja.ConstructorCall) *goja.Object
-	appCtorSync func(goja.ConstructorCall) *goja.Object
-	apps        map[string]*goja.Object
+	appCtor     func(sobek.ConstructorCall) *sobek.Object
+	appCtorSync func(sobek.ConstructorCall) *sobek.Object
+	apps        map[string]*sobek.Object
 	lookup      map[string]string
 	logger      logrus.FieldLogger
 }
@@ -50,7 +50,7 @@ var (
 	_ modules.Instance = (*Module)(nil)
 )
 
-func (mod *Module) runtime() *goja.Runtime {
+func (mod *Module) runtime() *sobek.Runtime {
 	return mod.vu.Runtime()
 }
 
@@ -64,7 +64,7 @@ func (mod *Module) throwf(format string, err error, args ...interface{}) {
 
 func (mod *Module) Exports() modules.Exports {
 	exports := mod.ModuleInstance.Exports()
-	defaults := exports.Default.(*goja.Object) // nolint:forcetypeassert
+	defaults := exports.Default.(*sobek.Object) // nolint:forcetypeassert
 
 	mod.wrapHTTPExports(defaults)
 
@@ -86,10 +86,10 @@ type options struct {
 	skip bool
 }
 
-func getopts(value goja.Value) *options {
+func getopts(value sobek.Value) *options {
 	opts := new(options)
 
-	if obj, ok := value.(*goja.Object); ok {
+	if obj, ok := value.(*sobek.Object); ok {
 		flag := func(name string) bool {
 			v := obj.Get(name)
 

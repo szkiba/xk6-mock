@@ -7,7 +7,7 @@ package mock
 import (
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,14 +16,14 @@ func TestNewMockArgs(t *testing.T) {
 
 	helper := newHelper(t)
 
-	call := goja.FunctionCall{
-		This:      goja.Undefined(),
-		Arguments: []goja.Value{},
+	call := sobek.FunctionCall{
+		This:      sobek.Undefined(),
+		Arguments: []sobek.Value{},
 	}
 
 	assert.Panics(t, func() { helper.module.newMockArgs(call) })
 
-	callback := helper.vu.Runtime().ToValue(func(goja.FunctionCall) goja.Value { return nil })
+	callback := helper.vu.Runtime().ToValue(func(sobek.FunctionCall) sobek.Value { return nil })
 
 	call.Arguments = append(call.Arguments, callback)
 
@@ -59,7 +59,7 @@ func TestMockUnmok_skip(t *testing.T) {
 
 	helper := newHelper(t)
 
-	call := goja.FunctionCall{This: nil, Arguments: nil}
+	call := sobek.FunctionCall{This: nil, Arguments: nil}
 
 	assert.Panics(t, func() { helper.module.mock(call) })
 

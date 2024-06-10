@@ -7,7 +7,7 @@ package mock
 import (
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/stretchr/testify/assert"
 	"go.k6.io/k6/js/modules"
 )
@@ -20,7 +20,7 @@ func TestNewModuleInstance(t *testing.T) {
 	vu := tc.vu // nolint:varnamelen
 
 	exports := mod.Exports()
-	defaults := exports.Default.(*goja.Object) // nolint:forcetypeassert
+	defaults := exports.Default.(*sobek.Object) // nolint:forcetypeassert
 
 	assert.NotEmpty(t, exports.Default)
 	assert.Empty(t, exports.Named)
@@ -28,7 +28,7 @@ func TestNewModuleInstance(t *testing.T) {
 	appCtor := defaults.Get("Application")
 	assert.NotNil(t, appCtor, "missing Application constructor")
 
-	_, ok := goja.AssertConstructor(appCtor)
+	_, ok := sobek.AssertConstructor(appCtor)
 
 	assert.True(t, ok, "not a constructor")
 
@@ -48,7 +48,7 @@ var exported = []string{"get", "head", "post", "put", "patch", "options", "del",
 func testModuleExports(t *testing.T, exports modules.Exports) {
 	t.Helper()
 
-	defaults := exports.Default.(*goja.Object) // nolint:forcetypeassert
+	defaults := exports.Default.(*sobek.Object) // nolint:forcetypeassert
 
 	for _, name := range exported {
 		assert.NotNil(t, defaults.Get(name))

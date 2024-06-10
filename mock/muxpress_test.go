@@ -7,7 +7,7 @@ package mock
 import (
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"go.k6.io/k6/js/modules"
@@ -54,17 +54,17 @@ func TestGetopts(t *testing.T) {
 	assert.False(t, opts.sync)
 	assert.False(t, opts.skip)
 
-	opts = getopts(goja.Undefined())
+	opts = getopts(sobek.Undefined())
 
 	assert.False(t, opts.sync)
 	assert.False(t, opts.skip)
 
-	opts = getopts(goja.Null())
+	opts = getopts(sobek.Null())
 
 	assert.False(t, opts.sync)
 	assert.False(t, opts.skip)
 
-	runtime := goja.New()
+	runtime := sobek.New()
 	obj := runtime.NewObject()
 
 	opts = getopts(obj)
@@ -72,8 +72,8 @@ func TestGetopts(t *testing.T) {
 	assert.False(t, opts.sync)
 	assert.False(t, opts.skip)
 
-	assert.NoError(t, obj.Set("sync", goja.Null()))
-	assert.NoError(t, obj.Set("skip", goja.Undefined()))
+	assert.NoError(t, obj.Set("sync", sobek.Null()))
+	assert.NoError(t, obj.Set("skip", sobek.Undefined()))
 
 	opts = getopts(obj)
 
@@ -132,15 +132,15 @@ func TestApplicationCtor(t *testing.T) {
 
 	ctor := module.applicationCtor()
 
-	call := goja.ConstructorCall{
+	call := sobek.ConstructorCall{
 		This:      vu.Runtime().GlobalObject(),
 		NewTarget: vu.Runtime().NewObject(),
-		Arguments: []goja.Value{},
+		Arguments: []sobek.Value{},
 	}
 
 	appCtorCalled := false
 
-	module.appCtor = func(cc goja.ConstructorCall) *goja.Object {
+	module.appCtor = func(cc sobek.ConstructorCall) *sobek.Object {
 		appCtorCalled = true
 
 		return nil
@@ -156,7 +156,7 @@ func TestApplicationCtor(t *testing.T) {
 
 	appCtorCalled = false
 
-	module.appCtorSync = func(cc goja.ConstructorCall) *goja.Object {
+	module.appCtorSync = func(cc sobek.ConstructorCall) *sobek.Object {
 		appCtorSyncCalled = true
 
 		return nil

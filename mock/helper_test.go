@@ -7,7 +7,7 @@ package mock
 import (
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"go.k6.io/k6/js/modulestest"
@@ -35,7 +35,7 @@ func newHelper(t *testing.T) *testHelper {
 	assert.NotNil(t, module)
 
 	exports := module.Exports()
-	obj := exports.Default.(*goja.Object) // nolint:forcetypeassert
+	obj := exports.Default.(*sobek.Object) // nolint:forcetypeassert
 
 	assert.NoError(t, vu.Runtime().Set("mock", obj.Get("mock")))
 	assert.NoError(t, vu.Runtime().Set("unmock", obj.Get("unmock")))
@@ -57,11 +57,11 @@ func (suite *suiteBase) SetupSuite() {
 	suite.testHelper = newHelper(suite.T())
 }
 
-func (suite *suiteBase) run(script string) (goja.Value, error) {
+func (suite *suiteBase) run(script string) (sobek.Value, error) {
 	return suite.vu.Runtime().RunString(script)
 }
 
-func (suite *suiteBase) js(script string) goja.Value {
+func (suite *suiteBase) js(script string) sobek.Value {
 	value, err := suite.run(script)
 
 	suite.NoError(err)
