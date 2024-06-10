@@ -5,7 +5,7 @@
 package mock
 
 import (
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"go.k6.io/k6/js/common"
 )
 
@@ -16,7 +16,7 @@ var (
 	urlSecondMethods = []string{"request", "asyncRequest"}
 )
 
-func (mod *Module) wrapHTTPExports(defaults *goja.Object) {
+func (mod *Module) wrapHTTPExports(defaults *sobek.Object) {
 	for _, method := range urlFirstMethods {
 		mod.wrap(defaults, method, 0)
 	}
@@ -26,15 +26,15 @@ func (mod *Module) wrapHTTPExports(defaults *goja.Object) {
 	}
 }
 
-func (mod *Module) wrap(this *goja.Object, method string, index int) {
+func (mod *Module) wrap(this *sobek.Object, method string, index int) {
 	v := this.Get(method)
 
-	callable, ok := goja.AssertFunction(v)
+	callable, ok := sobek.AssertFunction(v)
 	if !ok {
 		mod.throwf("%s must be callable", errInvalidArg, method)
 	}
 
-	wrapper := func(call goja.FunctionCall) goja.Value {
+	wrapper := func(call sobek.FunctionCall) sobek.Value {
 		if len(call.Arguments) > index {
 			mod.rewrite(call.Arguments, index)
 		}

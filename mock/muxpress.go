@@ -5,7 +5,7 @@
 package mock
 
 import (
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/sirupsen/logrus"
 	"github.com/szkiba/muxpress"
 	"go.k6.io/k6/js/common"
@@ -34,7 +34,7 @@ func newLogger(vu modules.VU) logrus.FieldLogger { // nolint:varnamelen
 	return logger.WithField("module", "mock")
 }
 
-func newApplicationCtor(vu modules.VU, sync bool) func(goja.ConstructorCall) *goja.Object { // nolint:varnamelen
+func newApplicationCtor(vu modules.VU, sync bool) func(sobek.ConstructorCall) *sobek.Object { // nolint:varnamelen
 	opts := []muxpress.Option{muxpress.WithLogger(newLogger(vu))}
 
 	if !sync {
@@ -49,8 +49,8 @@ func newApplicationCtor(vu modules.VU, sync bool) func(goja.ConstructorCall) *go
 	return ctor
 }
 
-func (mod *Module) applicationCtor() func(goja.ConstructorCall) *goja.Object {
-	return func(call goja.ConstructorCall) *goja.Object {
+func (mod *Module) applicationCtor() func(sobek.ConstructorCall) *sobek.Object {
+	return func(call sobek.ConstructorCall) *sobek.Object {
 		if len(call.Arguments) == 0 || !getopts(call.Argument(0)).sync {
 			return mod.appCtor(call)
 		}
@@ -59,14 +59,14 @@ func (mod *Module) applicationCtor() func(goja.ConstructorCall) *goja.Object {
 	}
 }
 
-func (mod *Module) newApplication(sync bool) (*goja.Object, goja.Callable) {
+func (mod *Module) newApplication(sync bool) (*sobek.Object, sobek.Callable) {
 	from := mod.appCtor
 
 	if sync {
 		from = mod.appCtorSync
 	}
 
-	ctor, assertOK := goja.AssertConstructor(mod.runtime().ToValue(from))
+	ctor, assertOK := sobek.AssertConstructor(mod.runtime().ToValue(from))
 	if !assertOK {
 		mod.throwf("invalid constructor", errInvalidArg)
 	}
@@ -76,7 +76,7 @@ func (mod *Module) newApplication(sync bool) (*goja.Object, goja.Callable) {
 		mod.throw(err)
 	}
 
-	listen, assertOK := goja.AssertFunction(app.Get("listen"))
+	listen, assertOK := sobek.AssertFunction(app.Get("listen"))
 	if !assertOK {
 		mod.throwf("missing listen method", errInvalidArg)
 	}

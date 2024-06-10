@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 )
 
 func (mod *Module) skipMock() bool {
@@ -21,21 +21,21 @@ func (mod *Module) skipMock() bool {
 
 type mockArgs struct {
 	target   string
-	callback goja.Callable
+	callback sobek.Callable
 	options  *options
 }
 
-func (mod *Module) newMockArgs(call goja.FunctionCall) *mockArgs {
+func (mod *Module) newMockArgs(call sobek.FunctionCall) *mockArgs {
 	args := new(mockArgs)
 
 	for idx := 0; idx < len(call.Arguments); idx++ {
-		if c, isFunc := goja.AssertFunction(call.Argument(idx)); isFunc {
+		if c, isFunc := sobek.AssertFunction(call.Argument(idx)); isFunc {
 			args.callback = c
 
 			continue
 		}
 
-		if obj, isObj := call.Argument(idx).(*goja.Object); isObj {
+		if obj, isObj := call.Argument(idx).(*sobek.Object); isObj {
 			args.options = getopts(obj)
 
 			continue
@@ -61,15 +61,15 @@ func (mod *Module) newMockArgs(call goja.FunctionCall) *mockArgs {
 	return args
 }
 
-func (mod *Module) mock(call goja.FunctionCall) goja.Value {
+func (mod *Module) mock(call sobek.FunctionCall) sobek.Value {
 	if mod.skipMock() {
-		return goja.Undefined()
+		return sobek.Undefined()
 	}
 
 	args := mod.newMockArgs(call)
 
 	if args.options.skip {
-		return goja.Undefined()
+		return sobek.Undefined()
 	}
 
 	app, listen := mod.newApplication(args.options.sync)
@@ -88,24 +88,24 @@ func (mod *Module) mock(call goja.FunctionCall) goja.Value {
 	if addr == nil || len(addr.String()) == 0 {
 		mod.logger.WithField("target", args.target).Warn("mock server not started")
 
-		return goja.Undefined()
+		return sobek.Undefined()
 	}
 
 	mod.apps[args.target] = app
 	mod.lookup[args.target] = "http://" + addr.String()
 
-	return goja.Undefined()
+	return sobek.Undefined()
 }
 
-func (mod *Module) mockWithSkip() goja.Value {
-	function := mod.runtime().ToValue(mod.mock).(*goja.Object) // nolint:forcetypeassert
+func (mod *Module) mockWithSkip() sobek.Value {
+	function := mod.runtime().ToValue(mod.mock).(*sobek.Object) // nolint:forcetypeassert
 
-	function.Set("skip", func(_ goja.FunctionCall) goja.Value { return goja.Undefined() }) // nolint:errcheck
+	function.Set("skip", func(_ sobek.FunctionCall) sobek.Value { return sobek.Undefined() }) // nolint:errcheck
 
 	return function
 }
 
-func (mod *Module) unmock(target goja.Value) {
+func (mod *Module) unmock(target sobek.Value) {
 	if mod.skipMock() {
 		return
 	}
@@ -120,14 +120,14 @@ func (mod *Module) unmock(target goja.Value) {
 	delete(mod.apps, key)
 	delete(mod.lookup, key)
 
-	shutdown, _ := goja.AssertFunction(app.Get("shutdown"))
+	shutdown, _ := sobek.AssertFunction(app.Get("shutdown"))
 
 	if _, err := shutdown(app); err != nil {
 		mod.throw(err)
 	}
 }
 
-func (mod *Module) rewrite(args []goja.Value, index int) {
+func (mod *Module) rewrite(args []sobek.Value, index int) {
 	loc := args[index].String()
 
 	if strings.HasPrefix(loc, "http://localhost") || strings.HasPrefix(loc, "http://127.") {

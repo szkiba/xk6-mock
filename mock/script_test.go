@@ -7,7 +7,7 @@ package mock
 import (
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/imroc/req/v3"
 	"github.com/stretchr/testify/suite"
 )
@@ -62,7 +62,7 @@ mock("https://example.com", handler, {sync:true})
 		suite.Equal(1, len(suite.module.apps))
 		suite.Equal(1, len(suite.module.lookup))
 
-		args := []goja.Value{suite.vu.Runtime().ToValue("https://example.com")}
+		args := []sobek.Value{suite.vu.Runtime().ToValue("https://example.com")}
 
 		suite.module.rewrite(args, 0)
 		suite.Equal(suite.module.lookup["https://example.com"], args[0].String())
@@ -83,7 +83,7 @@ mock("https://example.com", handler, {sync:true})
 		suite.Empty(suite.module.lookup)
 		suite.Empty(suite.module.apps)
 
-		args := []goja.Value{suite.vu.Runtime().ToValue("https://example.com")}
+		args := []sobek.Value{suite.vu.Runtime().ToValue("https://example.com")}
 
 		suite.module.rewrite(args, 0)
 
@@ -108,12 +108,12 @@ mock("http://127.0.0.1", handler, {sync:true})
 	suite.Equal(2, len(suite.module.apps))
 	suite.Equal(2, len(suite.module.lookup))
 
-	args := []goja.Value{suite.vu.Runtime().ToValue("http://localhost")}
+	args := []sobek.Value{suite.vu.Runtime().ToValue("http://localhost")}
 
 	suite.module.rewrite(args, 0)
 	suite.Equal("http://localhost", args[0].String())
 
-	args = []goja.Value{suite.vu.Runtime().ToValue("http://127.0.0.1")}
+	args = []sobek.Value{suite.vu.Runtime().ToValue("http://127.0.0.1")}
 
 	suite.module.rewrite(args, 0)
 	suite.Equal("http://127.0.0.1", args[0].String())
